@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- 리스너 클래스의 초기화 메소드에서 ApplicationContext를 이용하여 
+	읽어 들이는 Bean Configuration File -->
+	<!-- => 모든 Front Controller에게 공통적으로 사용하고자 하는 Spring Bean 생성 -->
+	<!-- => DAO 클래스 관련 Spring Bean 생성 : DataSource, JdbcTemplate, 
+	SqlSessionFactory, SqlSesseion, TransactionManager등 -->
+	
+	<!-- DataSource Spring Bean 생성 => SpringFramework의 spring-jdbc 라이브러리의 클래스 이용 -->	
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="url" value="jdbc:oracle:thin:@www.itwill.xyz:1521:xe"/>
+		<property name="username" value="iljo"/>
+		<property name="password" value="iljo"/>
+	</bean> -->
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+		<property name="url" value="jdbc:log4jdbc:oracle:thin:@www.itwill.xyz:1521:xe"/>
+		<property name="username" value="iljo"/>
+		<property name="password" value="iljo"/>
+	</bean>
+	
+	<!-- SqlSessionFactoryBean Spring Bean 생성 
+	was가 기본적으로 검색하는 디렉토리는 webapp 이기 때문에 다른 곳에 xml 파일을 만들꺼면 classpath: 를 붙여줘야 한다. -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="/WEB-INF/spring/mybatis-config.xml"/> 
+		<!-- src/main/resources 패키지 폴더에 환경설정파일 작성할 때는  classpath:/ 붙여준다. -->
+		<!-- <property name="configLocation" value="classpath:/mybatis-config.xml"/> -->
+		<property name="dataSource" ref="dataSource"/>
+		<property name="typeAliasesPackage" value="com.itwill.dto"/>
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/itwill/mapper/*.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- SqlSessionTemplate Spring Bean 생성 
+		 SqlSessionTemplate Spring Bean이 소멸되기 전에 clearCache() 메소드 호출
+		 clearCache() 메소드 : SqlSessionTemplate Spring Bean 사용 후 close() 메소드가 자동호출 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg ref="sqlSessionFactoryBean"/>
+	</bean>
+	
+	<!-- DataSourceTransactionManager Spring Bean 생성
+		 SpringFramework에서 제공하는 TransactionManager를 이용하여 트랜젝션 관리 : 일관성 있는 트랜젝션 제어가 가능 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<tx:annotation-driven/>
+</beans>

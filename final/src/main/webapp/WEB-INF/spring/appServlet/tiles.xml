@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC 
+	"-//APACHE Software Foundation//DTD Tiles Configuration 3.0//EN" 
+	"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<definition name="admin" template="/WEB-INF/views/admin/template_admin.jsp">
+		<put-attribute name="header"  value="/WEB-INF/views/admin/header_admin.jsp"/>
+		<put-attribute name="content" value="/WEB-INF/views/admin/main_admin.jsp"/>
+	</definition>
+	<definition name="admin/memberDetail_P" template="/WEB-INF/views/admin/content/memberDetail_P.jsp"></definition>
+	<definition name="admin/restaurantDetail_P" template="/WEB-INF/views/admin/content/restaurantDetail_P.jsp"></definition>
+	<definition name="admin/reviewDetail_P" template="/WEB-INF/views/admin/content/reviewDetail_P.jsp"></definition>
+	<definition name="admin/bookingDetail_P" template="/WEB-INF/views/admin/content/bookingDetail_P.jsp"></definition>
+	<definition name="admin/*" extends="admin">
+		<put-attribute name="content" value="/WEB-INF/views/admin/{1}.jsp"/>
+	</definition>
+	
+	<definition name="admin/*/*" extends="admin">
+		<put-attribute name="content" value="/WEB-INF/views/admin/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="admin/*/*/*" extends="admin">
+		<put-attribute name="content" value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+ 	<definition name="mypage/myContent/*" template="/WEB-INF/views/mypage/myContent/{1}.jsp"></definition> 
+	<!-- definition : 템플릿 페이지를 설정하기 위한 상위 엘리먼트 
+		 name 속성 : 템플릿 페이지를 불러오기 위한 요청 처리 메소드에서 반환되는 ViewName을 속성값으로 설정  - 템플릿 페이지의 고유값
+		 template 속성 : template ViewPage를 속성값으로 설정 -->
+	<definition name="index" template="/WEB-INF/views/layout/template.jsp">
+		<!-- put-attribute : 템플릿 페이지를 구성하기 위한 요소를 설정하는 엘리먼트 
+			 name 속성 : 템플릿 페이지에서 요소를 불러오기 위한 고유값을 속성값으로 설정
+			 value 속성 : 요소의 고유값으로 템플릿 페이지에 포함되는 viewPage 설정 -->
+		<put-attribute name="header"  value="/WEB-INF/views/layout/header.jsp"/>
+		<put-attribute name="content" value="/WEB-INF/views/layout/main.jsp"/>
+		<put-attribute name="footer"  value="/WEB-INF/views/layout/footer.jsp"/>
+	</definition>
+	
+	<!-- definition 엘리먼트의  name 속성값으로 *을 사용할 경우 요청 처리 메소드에서 반환하는 
+		 모든 viewName에 대한 ViewPage 설정
+		 extends 속성 : 이미 선언된 definition 엘리먼트의 정보를 상속 받아 
+		 template 속성 및 put-attribute 엘리먼트 상속 -->
+	<definition name="*" extends="index">
+		<!-- 상속 받은  put-attribute 엘리먼트에 대한 오버라이드 선언 가능-->
+		<!-- 요청 처리 메소드에서 반환되는 ViewName을 {정수} 형식으로 표현
+			 definition 엘리먼트의 name 속성값을 *를 1부터 시작되어 1씩 증가하는 정수로 표현 -->
+		<put-attribute name="content" value="/WEB-INF/views/{1}.jsp"/>
+	</definition>
+	
+	<definition name="*/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+</tiles-definitions>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.mapper.RestaurantMapper">
+
+ 	<insert id="addRestaurant" parameterType="Restaurant">
+
+	INSERT INTO restaurant VALUES(
+	restaurant_seq.nextval,#{businessNo},#{rstName},#{address1},#{address2},#{rstPhone},#{id},#{name},
+	#{areaNo},#{holiday},
+	#{foodTypeNo},#{budget},#{mainImg},#{detailImg},#{tip},
+	#{detailText},#{addInfo},#{want},#{seat},#{rstStatus},#{score},#{latitude},
+	#{longitude},#{openTime},#{closeTime}
+	)
+	</insert>
+	
+	<select id="getRestaurantByRstNo" resultType="Restaurant">
+	SELECT * FROM restaurant WHERE rst_no=#{rstNo}
+	</select>
+	
+	<select id="getRestaurantByFoodType" parameterType="map" resultType="Restaurant">
+	SELECT * FROM 
+	(SELECT rownum rn,temp.* FROM
+	(SELECT * FROM 
+
+(select restaurant.*,nvl(re_score,0.0) as re_score from restaurant left join 
+(select rst_no,avg(re_score) as re_score  from review group by rst_no) temp on restaurant.rst_no = temp.rst_no)
+
+ WHERE food_type_no=#{foodTypeNo} ORDER BY re_score desc) temp)
+	WHERE #{count}>=rn
+	</select>
+	
+
+	
+	<select id="getRestaurantForWant" parameterType="map" resultType="Restaurant">
+	SELECT * FROM 
+	(SELECT rownum rn,temp.* FROM
+	(SELECT * FROM 
+	
+(select restaurant.*,nvl(re_score,0.0) as re_score from restaurant left join 
+(select rst_no,avg(re_score) as re_score  from review group by rst_no) temp on restaurant.rst_no = temp.rst_no)
+
+	 WHERE rst_no IN (SELECT rst_no FROM want WHERE id = #{id})) temp)
+	WHERE rn BETWEEN #{startRow} and #{endRow}
+	</select>
+	
+	<select id="getTotalRestaurantForWant" parameterType="string" resultType="int">
+	SELECT COUNT(*) FROM restaurant WHERE rst_no IN (SELECT rst_no FROM want WHERE id = #{id})
+	</select>
+	
+	
+	<select id="getRestaurantForSearch" parameterType="map"
+		resultType="Restaurant">
+		SELECT * FROM
+		(SELECT rownum rn,temp.* FROM 
+		( SELECT * FROM 
+
+
+		(select restaurant.*,nvl(re_score,0.0) as re_score from restaurant left join 
+(select rst_no,avg(re_score) as re_score  from review group by rst_no) temp on restaurant.rst_no = temp.rst_no)
+
+
+		<where>
+			<if test="areas!=null">
+			areano in
+				<foreach item="area" index="index" collection="areas" open="("
+					separator="," close=")">
+					#{area}
+				</foreach>
+			</if>
+			<if test="foodTypes!=null">
+			AND	food_type_no in
+				<foreach item="type" index="index" collection="foodTypes"
+					open="(" separator="," close=")">
+					#{type}
+				</foreach>
+			</if>
+			<if test="keyword!=null">
+			AND	rst_name like '%'||#{keyword}||'%'
+			</if>
+		</where>) temp)
+		WHERE rn BETWEEN #{startRow} and #{endRow}
+	</select>
+<!-- 	<select id="getRestaurantForSearch" parameterType="map"
+		resultType="RestaurantDTO">
+		SELECT * FROM restaurant
+		<where>
+			<if test="areas!=null">
+			area_no in
+				<foreach item="area" index="index" collection="areas" open="("
+					separator="," close=")">
+					#{area}
+				</foreach>
+			</if>
+			<if test="foodTypes!=null">
+			AND	food_type_no in
+				<foreach item="type" index="index" collection="foodTypes"
+					open="(" separator="," close=")">
+					#{type}
+				</foreach>
+			</if>
+			<if test="keyword!=null">
+			AND	rst_name like '%'||#{keyword}||'%'
+			</if>
+		</where>
+	</select> -->
+
+	<select id="getTotalRestaurantForSearch" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM restaurant
+		<where>
+			<if test="areas!=null">
+				areano in
+				<foreach item="area" index="index" collection="areas" open="("
+					separator="," close=")">
+					#{area}
+				</foreach>
+			</if>
+			<if test="foodTypes!=null">
+				AND food_type_no in
+				<foreach item="type" index="index" collection="foodTypes"
+					open="(" separator="," close=")">
+					#{type}
+				</foreach>
+			</if>
+			<if test="keyword!=null">
+				AND rst_name like '%'||#{keyword}||'%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getRestaurantAll" resultType="Restaurant">
+		<!-- SELECT * FROM restaurant -->
+		SELECT rest.*,city,dong,food_type_name 
+		FROM 
+		 (SELECT * FROM restaurant) rest
+		JOIN area ON area.areano= rest.areano 
+		JOIN food_type ON food_type.food_type_no = rest.food_type_no
+	</select>
+	
+	<!-- 레스토랑 넘버로 푸드타입네임 구하기 -->
+	<select id="getFoodTypeName"  resultType="string">
+		select food_type_name from restaurant join food_type on restaurant.food_type_no=food_type.food_type_no where rst_no=#{rstNo}
+	</select>
+	
+</mapper>

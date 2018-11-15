@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mybatis framework 주환경설정 파일 -->
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	
+	<settings>
+		<!-- setting : mybatis를 실행할 경우 필요한 정보를 제공하기 위한 엘리먼트  -->
+		<!-- <setting name="useGeneratedKeys" value="true"/> -->
+		<setting name="autoMappingUnknownColumnBehavior" value="WARNING"/>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="callSettersOnNulls" value="true"/>
+	</settings>
+	
+	
+</configuration>
+
